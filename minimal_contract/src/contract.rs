@@ -1,5 +1,6 @@
 /// Nobody cares about imports, just ignore them.
-use cosmwasm_std::{entry_point, DepsMut, Env, MessageInfo, Response, StdError, Uint128};
+use cosmwasm_std::{entry_point, DepsMut, Env, MessageInfo, Response, StdError, Uint128, Deps, StdResult, Binary, to_json_binary};
+use cosmwasm_schema::{cw_serde, QueryResponses};
 use cw_storage_plus::Item;
 use neutron_sdk::bindings::msg::NeutronMsg;
 use schemars::JsonSchema;
@@ -12,7 +13,7 @@ use thiserror::Error;
 /// and deserialized, including the types that you defined yourself.
 pub const COUNTER: Item<Uint128> = Item::new("counter");
 
-/// This code gets executed when you instantiate your contract. It's one
+/// instantiate() gets executed when you instantiate your contract. It's one
 /// of the 3 most important entry points in CosmWasm: instantiate(),
 /// execute(), and query().
 ///
@@ -22,6 +23,7 @@ pub const COUNTER: Item<Uint128> = Item::new("counter");
 ///             e.g., the address of the current contract
 ///     - info: keeps information about the message that is currently
 ///             executed, e.g., the address of the message sender
+///     - msg:  the InstantiateMsg that you define yourself.
 ///
 /// InstantiateMsg is defined below.
 #[cfg_attr(not(feature = "library"), entry_point)]
@@ -31,7 +33,7 @@ pub fn instantiate(
     info: MessageInfo,
     msg: InstantiateMsg,
     // The return type of this entrypoint is Result<Response<NeutronMsg>, ContractError>.
-    // Without going too much into the details, it means that this entrypoint can either
+    // Without going too much into the detai1ls, it means that this entrypoint can either
     // return a valid Result, or a ContractError. The ContractError type is defined below.
 ) -> Result<Response<NeutronMsg>, ContractError> {
     // Here we save the initial value from the InstantiateMsg to the COUNTER
@@ -134,3 +136,16 @@ pub enum ExecuteMsg {
 /// Don't use magic numbers in your code! Move them to constants instead.
 pub const MAX_INCREASE_AMOUNT: Uint128 = Uint128::new(100u128);
 
+pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
+    match msg {
+        QueryMsg::CurrentValue {} => { to_json_binary(&COUNTER.load(deps.storage)?) }
+    }
+}
+
+#[cw_serde]
+#[derive(QueryResponses)]
+pub enum QueryMsg {
+    /// Returns the current value of the COUNTER.
+    #[returns(Uint128)]
+    CurrentValue {},
+}
