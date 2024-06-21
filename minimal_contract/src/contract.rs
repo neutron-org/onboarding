@@ -39,7 +39,8 @@ pub fn instantiate(
     // Here we save the initial value from the InstantiateMsg to the COUNTER
     // storage item. Saving data to storage consumes gas!
     //
-    // This operation can also return
+    // This operation can return an error, which will be automatically returned to the user
+    // because of the `?` operator.
     COUNTER.save(deps.storage, &msg.initial_value)?;
 
     Ok(Response::new()
