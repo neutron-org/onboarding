@@ -34,7 +34,7 @@ pub fn instantiate(
     msg: InstantiateMsg,
     // The return type of this entrypoint is Result<Response<NeutronMsg>, ContractError>.
     // Without going too much into the details, it means that this entrypoint can either
-    // return a valid Result, or a ContractError. The ContractError type is defined below.
+    // return a valid Response, or a ContractError. The ContractError type is defined below.
 ) -> Result<Response<NeutronMsg>, ContractError> {
     // Here we save the initial value from the InstantiateMsg to the COUNTER
     // storage item. Saving data to storage consumes gas!
@@ -42,6 +42,8 @@ pub fn instantiate(
     // This operation can return an error, which will be automatically returned to the user
     // because of the `?` operator.
     COUNTER.save(deps.storage, &msg.initial_value)?;
+
+    deps.
 
     Ok(Response::new()
         // We add some attributes to the response with information about the current call.
