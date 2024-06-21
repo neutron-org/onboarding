@@ -33,7 +33,7 @@ pub fn instantiate(
     info: MessageInfo,
     msg: InstantiateMsg,
     // The return type of this entrypoint is Result<Response<NeutronMsg>, ContractError>.
-    // Without going too much into the detai1ls, it means that this entrypoint can either
+    // Without going too much into the details, it means that this entrypoint can either
     // return a valid Result, or a ContractError. The ContractError type is defined below.
 ) -> Result<Response<NeutronMsg>, ContractError> {
     // Here we save the initial value from the InstantiateMsg to the COUNTER
