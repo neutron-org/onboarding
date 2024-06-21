@@ -136,7 +136,15 @@ pub enum ExecuteMsg {
 /// Don't use magic numbers in your code! Move them to constants instead.
 pub const MAX_INCREASE_AMOUNT: Uint128 = Uint128::new(100u128);
 
+/// This is the query() entrypoint. It allows the contract to define queries that
+/// can be run by the user. Queries can not modify state.
+///
+/// The ExecuteMsg is en enum that is defined below.
+///
+/// This entrypoint expects the same arguments that execute() does, but instead
+/// of InstantiateMsg, it needs the ExecuteMsg, and there is no MessageInfo.
 pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
+    /// Similar to execute(), we try to parse msg into any of the known variants of QueryMsg.
     match msg {
         QueryMsg::CurrentValue {} => { to_json_binary(&COUNTER.load(deps.storage)?) }
     }
@@ -145,7 +153,7 @@ pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
 #[cw_serde]
 #[derive(QueryResponses)]
 pub enum QueryMsg {
-    /// Returns the current value of the COUNTER.
+    /// A query message to get the current value of COUNTER.
     #[returns(Uint128)]
     CurrentValue {},
 }
