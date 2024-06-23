@@ -80,6 +80,9 @@ pub enum ContractError {
     InvalidIncreaseAmount { amount: Uint128 },
 }
 
+/// Don't use magic numbers in your code! Move them to constants instead.
+pub const MAX_INCREASE_AMOUNT: Uint128 = Uint128::new(100u128);
+
 /// This is the execute() entrypoint. Users that want to perform **actions**
 /// that modify the contract state (as opposed to running queries, which do not
 /// modify state) need to send one of the variants of the ExecuteMsg to this
@@ -142,9 +145,6 @@ pub enum ExecuteMsg {
     /// to be added to the COUNTER storage item value.
     IncreaseCount { amount: Uint128 },
 }
-
-/// Don't use magic numbers in your code! Move them to constants instead.
-pub const MAX_INCREASE_AMOUNT: Uint128 = Uint128::new(100u128);
 
 /// This is the query() entrypoint. It allows the contract to define queries that
 /// can be run by the user. Queries can not modify state.
