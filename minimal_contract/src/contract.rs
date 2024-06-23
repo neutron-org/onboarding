@@ -16,6 +16,14 @@ use thiserror::Error;
 /// and deserialized, including the types that you defined yourself.
 pub const COUNTER: Item<Uint128> = Item::new("counter");
 
+/// You define this message. Any data that is necessary to set up
+/// your new contract should be added there.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
+pub struct InstantiateMsg {
+    /// In our exciting minimal contract, we set the initial value for a counter.
+    initial_value: Uint128,
+}
+
 /// instantiate() gets executed when you instantiate your contract. It's one
 /// of the 3 most important entry points in CosmWasm: instantiate(),
 /// execute(), and query().
@@ -53,14 +61,6 @@ pub fn instantiate(
         .add_attribute("initial_value", msg.initial_value)
         .add_attribute("contract_address", env.contract.address)
         .add_attribute("sender", info.sender.to_string()))
-}
-
-/// You define this message. Any data that is necessary to set up
-/// your new contract should be added there.
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
-pub struct InstantiateMsg {
-    /// In our exciting minimal contract, we set the initial value for a counter.
-    initial_value: Uint128,
 }
 
 /// ExecuteMsg is the enum that defines the messages that the user can
