@@ -1,6 +1,9 @@
-/// Nobody cares about imports, just ignore them.
-use cosmwasm_std::{entry_point, DepsMut, Env, MessageInfo, Response, StdError, Uint128, Deps, StdResult, Binary, to_json_binary};
 use cosmwasm_schema::{cw_serde, QueryResponses};
+/// Nobody cares about imports, just ignore them.
+use cosmwasm_std::{
+    entry_point, to_json_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdError,
+    StdResult, Uint128,
+};
 use cw_storage_plus::Item;
 use neutron_sdk::bindings::msg::NeutronMsg;
 use schemars::JsonSchema;
@@ -42,8 +45,6 @@ pub fn instantiate(
     // This operation can return an error, which will be automatically returned to the user
     // because of the `?` operator.
     COUNTER.save(deps.storage, &msg.initial_value)?;
-
-    deps.
 
     Ok(Response::new()
         // We add some attributes to the response with information about the current call.
@@ -96,30 +97,36 @@ pub fn execute(
     // The `match` here tries to parse msg into any of the known variants of ExecuteMsg.
     // If it's not possible, the user will get an error.
     match msg {
-        ExecuteMsg::IncreaseCount { amount } => {
-            // Return the InvalidIncreaseAmount error if the user tries to increase
-            // by more than 100. We save this value in a well-named constant
-            // MAX_INCREASE_AMOUNT because we are nice people.
-            if amount.gt(&MAX_INCREASE_AMOUNT) {
-                return Err(ContractError::InvalidIncreaseAmount { amount });
-            }
-
-            // We need to increase the counter. Step 1: load the current value.
-            // This operation consumes gas!
-            let mut counter = COUNTER.load(deps.storage)?;
-
-            // Step 2: add the user value to the value loaded from the storage.
-            counter += amount;
-
-            // Step 3: save the increased amount to the storage.
-            COUNTER.save(deps.storage, &counter)?;
-
-            Ok(Response::default()
-                .add_attribute("action", "execute_add")
-                .add_attribute("amount", amount.to_string())
-                .add_attribute("sender", info.sender))
-        }
+        ExecuteMsg::IncreaseCount { amount } => execute_increase_amount(deps, info, amount),
     }
+}
+
+pub fn execute_increase_amount(
+    deps: DepsMut,
+    info: MessageInfo,
+    amount: Uint128,
+) -> Result<Response<NeutronMsg>, ContractError> {
+    // Return the InvalidIncreaseAmount error if the user tries to increase
+    // by more than 100. We save this value in a well-named constant
+    // MAX_INCREASE_AMOUNT because we are nice people.
+    if amount.gt(&MAX_INCREASE_AMOUNT) {
+        return Err(ContractError::InvalidIncreaseAmount { amount });
+    }
+
+    // We need to increase the counter. Step 1: load the current value.
+    // This operation consumes gas!
+    let mut counter = COUNTER.load(deps.storage)?;
+
+    // Step 2: add the user value to the value loaded from the storage.
+    counter += amount;
+
+    // Step 3: save the increased amount to the storage.
+    COUNTER.save(deps.storage, &counter)?;
+
+    Ok(Response::default()
+        .add_attribute("action", "execute_add")
+        .add_attribute("amount", amount.to_string())
+        .add_attribute("sender", info.sender))
 }
 
 /// ExecuteMsg is the enum that defines the messages that the user can
@@ -147,9 +154,9 @@ pub const MAX_INCREASE_AMOUNT: Uint128 = Uint128::new(100u128);
 /// This entrypoint expects the same arguments that execute() does, but instead
 /// of InstantiateMsg, it needs the ExecuteMsg, and there is no MessageInfo.
 pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
-    /// Similar to execute(), we try to parse msg into any of the known variants of QueryMsg.
+    // Similar to execute(), we try to parse msg into any of the known variants of QueryMsg.
     match msg {
-        QueryMsg::CurrentValue {} => { to_json_binary(&COUNTER.load(deps.storage)?) }
+        QueryMsg::CurrentValue {} => to_json_binary(&COUNTER.load(deps.storage)?),
     }
 }
 
