@@ -63,6 +63,20 @@ pub struct InstantiateMsg {
     initial_value: Uint128,
 }
 
+/// ExecuteMsg is the enum that defines the messages that the user can
+/// send to the contract.
+///
+/// You only need messages for actions that require
+/// state modification; for read-only actions, you have the query() entry
+/// point (see below)
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum ExecuteMsg {
+    /// This message allows the user to specify a Uint128 amount,
+    /// to be added to the COUNTER storage item value.
+    IncreaseCount { amount: Uint128 },
+}
+
 /// If this was really a **minimal** example, we would not define our own error type,
 /// and would simply return Err(StdError::generic_err("error message")) in case of an
 /// error.
@@ -130,20 +144,6 @@ pub fn execute_increase_amount(
         .add_attribute("action", "execute_add")
         .add_attribute("amount", amount.to_string())
         .add_attribute("sender", info.sender))
-}
-
-/// ExecuteMsg is the enum that defines the messages that the user can
-/// send to the contract.
-///
-/// You only need messages for actions that require
-/// state modification; for read-only actions, you have the query() entry
-/// point (see below)
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
-#[serde(rename_all = "snake_case")]
-pub enum ExecuteMsg {
-    /// This message allows the user to specify a Uint128 amount,
-    /// to be added to the COUNTER storage item value.
-    IncreaseCount { amount: Uint128 },
 }
 
 /// This is the query() entrypoint. It allows the contract to define queries that
