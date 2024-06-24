@@ -10,14 +10,18 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
+/// -------------------------- STORAGE ----------------------------------------
+
 /// Do you want your contract to have persistent state? If you do, you need
 /// storage items. This particular item stores a (potentially) very large
 /// integer number: Uint128, but you can store any value that can be serialized
 /// and deserialized, including the types that you defined yourself.
 pub const COUNTER: Item<Uint128> = Item::new("counter");
 
-/// You define this message. Any data that is necessary to set up
-/// your new contract should be added there.
+/// ------------------------ INSTANTIATION ------------------------------------
+
+/// Any data that is necessary to set up your new contract should be added
+/// here.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
 pub struct InstantiateMsg {
     /// In our exciting minimal contract, we set the initial value for a counter.
@@ -62,6 +66,8 @@ pub fn instantiate(
         .add_attribute("contract_address", env.contract.address)
         .add_attribute("sender", info.sender.to_string()))
 }
+
+/// ---------------------------- EXECUTION ------------------------------------
 
 /// ExecuteMsg is the enum that defines the messages that the user can
 /// send to the contract.
@@ -146,6 +152,26 @@ pub fn execute_increase_amount(
         .add_attribute("sender", info.sender))
 }
 
+/// ----------------------------- QUERIES ------------------------------------
+
+#[cw_serde]
+#[derive(QueryResponses)]
+pub enum QueryMsg {
+    /// A query message to get the current value of COUNTER. The `#[returns(Uint128)]`
+    /// derive marco here is required to generate proper JSON schemas for our smart
+    /// contract.
+    #[returns(Uint128)]
+    CurrentValue {},
+}
+
+/// We could simply read the Uint128 value from storage and return it as is,
+/// but in general it's better to provide a custom response types for your
+/// queries.
+#[cw_serde]
+pub struct CurrentValueResponse {
+    pub current_value: Uint128,
+}
+
 /// This is the query() entrypoint. It allows the contract to define queries that
 /// can be run by the user. Queries can not modify state.
 ///
@@ -156,14 +182,15 @@ pub fn execute_increase_amount(
 pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
     // Similar to execute(), we try to parse msg into any of the known variants of QueryMsg.
     match msg {
-        QueryMsg::CurrentValue {} => to_json_binary(&COUNTER.load(deps.storage)?),
+        QueryMsg::CurrentValue {} => query_current_value(deps),
     }
 }
 
-#[cw_serde]
-#[derive(QueryResponses)]
-pub enum QueryMsg {
-    /// A query message to get the current value of COUNTER.
-    #[returns(Uint128)]
-    CurrentValue {},
+pub fn query_current_value(deps: Deps) -> StdResult<Binary> {
+    let current_value = &COUNTER.load(deps.storage)?;
+    // to_json_binary is a handy helper function from cosmwasm_std that allows you
+    // to convert any properly defined Rust type to StdResult<Binary>.
+    to_json_binary(&CurrentValueResponse {
+        current_value: current_value.clone(),
+    })
 }
