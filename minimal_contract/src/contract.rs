@@ -178,6 +178,7 @@ pub struct CurrentValueResponse {
 ///
 /// This entrypoint expects the same arguments that execute() does, but instead
 /// of InstantiateMsg, it needs the ExecuteMsg, and there is no MessageInfo.
+#[cfg_attr(not(feature = "library"), entry_point)]
 pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
     // Similar to execute(), we try to parse msg into any of the known variants of QueryMsg.
     match msg {
