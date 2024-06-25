@@ -1,6 +1,6 @@
 #!/bin/bash
 DIR="$(dirname $0)"
-COMMIT_HASH_OR_BRANCH="main"
+COMMIT_HASH_OR_BRANCH="v3.0.6"
 cd $DIR
 VERSION=$(cat ../../package.json | jq -r '.version')
 VERSION=":$VERSION"
