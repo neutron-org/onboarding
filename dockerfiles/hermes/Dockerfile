@@ -11,4 +11,5 @@ RUN apt-get update && apt-get install -y wget && \
     tar -xf "$TARNAME" && \
     mv ./hermes /bin/hermes && \
     rm -rf "$TARNAME"
+
 ENTRYPOINT ["hermes", "start"]
