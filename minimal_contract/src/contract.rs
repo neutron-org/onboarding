@@ -194,3 +194,22 @@ pub fn query_current_value(deps: Deps) -> StdResult<Binary> {
         current_value: current_value.clone(),
     })
 }
+
+#[test]
+fn test_instantiate() {
+    let mut deps = mock_dependencies();
+    let env = mock_env();
+    let info = mock_info("addr1", &[]);
+
+    instantiate(
+        deps.as_mut(),
+        env.clone(),
+        info.clone(),
+        InstantiateMsg {
+            owner: Addr::unchecked("neutron_dao_address".to_string()),
+            source: Addr::unchecked("neutron_dao_address".to_string()),
+            fee_rate: Decimal::from_ratio(1u128, 100u128),
+        },
+    )
+        .unwrap();
+}
