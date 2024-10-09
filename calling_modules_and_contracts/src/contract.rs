@@ -204,6 +204,9 @@ pub fn reply(deps: DepsMut, _env: Env, msg: Reply) -> StdResult<Response> {
         Ok(Response::new()
             .add_attribute("reply", "success")
             .add_attribute("new_counter", counter))
+    } else if msg.id == BANK_SEND_REPLY_ID {
+        // Handle the bank response message here
+        Ok(Response::new().add_attribute("bank_reply", "success"))
     } else {
         Err(StdError::generic_err("unknown reply id"))
     }
