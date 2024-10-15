@@ -1,5 +1,4 @@
 import { CosmosKitProvider } from "@/contexts/CosmosKit";
-import { QueryProvider } from "@/contexts/Query";
 import type { Metadata } from "next";
 import "./globals.css";
 
@@ -15,11 +14,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <QueryProvider>
-          <CosmosKitProvider>
-            {children}
-          </CosmosKitProvider>
-        </QueryProvider>
+        <CosmosKitProvider>
+          {children}
+        </CosmosKitProvider>
       </body>
     </html>
   );

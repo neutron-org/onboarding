@@ -9,12 +9,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useChain } from "@cosmos-kit/react";
-import { useQuery } from "@tanstack/react-query";
 import assert from "assert";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
+// Your contract address here
 const CONTRACT_ADDRESS =
-  "neutron1nyuryl5u5z04dx4zsqgvsuw7fe8gl2f77yufynauuhklnnmnjncqcls0tj";
+  "neutron1nxshmmwrvxa2cp80nwvf03t8u5kvl2ttr8m8f43vamudsqrdvs8qqvfwpj";
 
 const useCounter = () => {
   const { address, getCosmWasmClient, getSigningCosmWasmClient } = useChain(
@@ -22,19 +22,18 @@ const useCounter = () => {
     true
   );
 
-  const { data: value, refetch: refetchValue } = useQuery({
-    queryKey: ["counter/value"],
-    queryFn: async () => {
-      const client = await getCosmWasmClient();
+  const [value, setValue] = useState<string | undefined>();
 
-      const { current_value } = (await client.queryContractSmart(
-        CONTRACT_ADDRESS,
-        { current_value: {} }
-      )) as { current_value: string };
+  const fetchValue = useCallback(async () => {
+    const client = await getCosmWasmClient();
 
-      return current_value;
-    },
-  });
+    const { current_value } = (await client.queryContractSmart(
+      CONTRACT_ADDRESS,
+      { current_value: {} }
+    )) as { current_value: string };
+
+    setValue(current_value);
+  }, [getCosmWasmClient]);
 
   const increaseValue = useCallback(
     async (amount: string) => {
@@ -53,12 +52,16 @@ const useCounter = () => {
         "auto"
       );
 
-      void refetchValue();
+      void fetchValue();
 
       return transactionHash;
     },
-    [address, getSigningCosmWasmClient, refetchValue]
+    [address, getSigningCosmWasmClient, fetchValue]
   );
+
+  useEffect(() => {
+    void fetchValue();
+  },[fetchValue]);
 
   return { value, increaseValue };
 };
