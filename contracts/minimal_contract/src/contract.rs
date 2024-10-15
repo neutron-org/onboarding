@@ -146,7 +146,6 @@ pub fn execute_increase_amount(
     COUNTER.save(deps.storage, &counter)?;
 
     Ok(Response::default()
-        .set_data(to_json_binary(&counter)?) // add counter to a data, so a caller could parse the response
         .add_attribute("action", "execute_add")
         .add_attribute("amount", amount.to_string())
         .add_attribute("sender", info.sender))

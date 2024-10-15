@@ -122,13 +122,22 @@ pub fn send_message_to_contract(deps: DepsMut, amount: Uint128) -> Result<Respon
 
     // here we compose a message to a minimal contract instance to increase a counter there by specified amount
     let message = CosmosMsg::Wasm(WasmMsg::Execute {
-        contract_addr: config.minimal_contract_address.into_string(),
+        contract_addr: config.clone().minimal_contract_address.into_string(),
         msg: to_json_binary(&MinimalContractExecuteMsg::IncreaseCount { amount })?,
         funds: vec![], // Optionally, you can send funds along with the message.
     });
 
+    let current_counter_value: CurrentValueResponse = deps.querier.query_wasm_smart(
+        config.minimal_contract_address,
+        &MinimalContractQueryMsg::CurrentValue {},
+    )?;
+
+    // we create a submessage to catch the successfull response
     Ok(Response::new()
-        .add_submessage(SubMsg::reply_on_success(message, INCREASE_COUNT_REPLY_ID)) // we create a submessage to catch the successfull response
+        .add_submessage(
+            SubMsg::reply_on_success(message, INCREASE_COUNT_REPLY_ID)
+                .with_payload(to_json_binary(&current_counter_value.current_value)?), // add counter to submsg payload, so we could parse it i reply handler
+        )
         .add_attribute("action", "send_message_to_contract"))
 }
 
@@ -180,13 +189,14 @@ pub fn send_tokens(
 }
 
 /// ----------------------------- REPLY HANDLER ------------------------------------
+#[cfg_attr(not(feature = "library"), entry_point)]
 pub fn reply(deps: DepsMut, _env: Env, msg: Reply) -> StdResult<Response> {
     let config = CONFIG.load(deps.storage)?;
 
     // Handle the response message here
     if msg.id == INCREASE_COUNT_REPLY_ID {
         // parse data field from minimal contract execution respons to get counter value
-        let counter: Uint128 = from_json(msg.payload)?;
+        let previous_counter: Uint128 = from_json(&msg.payload)?;
 
         // make a query to a minimal contract to get current counter value
         let current_counter_value_via_query: CurrentValueResponse = deps.querier.query_wasm_smart(
@@ -194,16 +204,16 @@ pub fn reply(deps: DepsMut, _env: Env, msg: Reply) -> StdResult<Response> {
             &MinimalContractQueryMsg::CurrentValue {},
         )?;
 
-        // check if counter value from a query does not equal to a counter value from response
-        if current_counter_value_via_query.current_value != counter {
+        // check if counter value from a was not actually updated by checking previous counter value we sent in SubMsg and current counter value from a query
+        if current_counter_value_via_query.current_value > previous_counter {
             return Err(StdError::generic_err(
-                "couter from response does not equal to a counter from query",
+                "counter from SubMsg does not equal to a counter from query",
             ));
         }
 
         Ok(Response::new()
             .add_attribute("reply", "success")
-            .add_attribute("new_counter", counter))
+            .add_attribute("new_counter", current_counter_value_via_query.current_value))
     } else if msg.id == BANK_SEND_REPLY_ID {
         // Handle the bank response message here
         Ok(Response::new().add_attribute("bank_reply", "success"))
