@@ -3,9 +3,9 @@ use std::str::FromStr;
 use cosmwasm_schema::{cw_serde, QueryResponses};
 use cosmwasm_std::Decimal;
 use cosmwasm_std::{
-    entry_point, from_json, to_json_binary, Addr, Binary, CosmosMsg, DecimalRangeExceeded, Deps,
-    DepsMut, Env, MessageInfo, OverflowError, Reply, Response, StdError, StdResult, SubMsg,
-    Uint128, WasmMsg,
+    entry_point, from_json, to_json_binary, Addr, Binary, CheckedFromRatioError, CosmosMsg,
+    DecimalRangeExceeded, Deps, DepsMut, Env, MessageInfo, Reply, Response, StdError, StdResult,
+    SubMsg, Uint128, WasmMsg,
 };
 use cw_storage_plus::Item;
 use neutron_sdk::bindings::msg::NeutronMsg;
@@ -96,7 +96,7 @@ pub enum ContractError {
     #[error(transparent)]
     DecimalErr(#[from] DecimalRangeExceeded),
     #[error(transparent)]
-    OverflowErr(#[from] OverflowError),
+    OverflowErr(#[from] CheckedFromRatioError),
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]
@@ -168,7 +168,7 @@ pub fn send_tokens(
 
     // convert usd amount to ntrn amount
     let ntrn_amount = Decimal::from_str(&usd_amount.to_string())?
-        .checked_mul(normalized_price)?
+        .checked_div(normalized_price)?
         .to_uint_floor();
 
     // compose bank send message
@@ -205,7 +205,7 @@ pub fn reply(deps: DepsMut, _env: Env, msg: Reply) -> StdResult<Response> {
         )?;
 
         // check if counter value from a was not actually updated by checking previous counter value we sent in SubMsg and current counter value from a query
-        if current_counter_value_via_query.current_value > previous_counter {
+        if current_counter_value_via_query.current_value <= previous_counter {
             return Err(StdError::generic_err(
                 "counter from SubMsg does not equal to a counter from query",
             ));
