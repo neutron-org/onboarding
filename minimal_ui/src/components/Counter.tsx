@@ -14,7 +14,7 @@ import { useCallback, useEffect, useState } from "react";
 
 // Your contract address here
 const CONTRACT_ADDRESS =
-  "neutron1nxshmmwrvxa2cp80nwvf03t8u5kvl2ttr8m8f43vamudsqrdvs8qqvfwpj";
+  "neutron1nyuryl5u5z04dx4zsqgvsuw7fe8gl2f77yufynauuhklnnmnjncqcls0tj";
 
 const useCounter = () => {
   const { address, getCosmWasmClient, getSigningCosmWasmClient } = useChain(
