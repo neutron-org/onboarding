@@ -74,6 +74,15 @@
       "post_start": ["/opt/init-gaia.sh > /opt/init-gaia.log 2>&1"]
     }
   },
+  "custom_containers": [
+    {
+      "name": "oracle",
+      "image": "skip-mev/slinky-e2e-oracle",
+      "entrypoint": "slinky --market-map-endpoint neutron_ics:9090",
+      "ports": ["8080:8080", "8002:8002"],
+      "depends_on": ["neutron_ics"]
+    }
+  ],
   "master_mnemonic": "doctor output analyst penalty keep pear plastic divert obscure very census awake",
   "loglevel": "debug",
   "wallets": {
