@@ -32,7 +32,9 @@
         "grpc.address": "0.0.0.0:9090",
         "minimum-gas-prices": "0.0025untrn",
         "rosetta.enable": "true",
-        "telemetry.prometheus-retention-time": 1000
+        "telemetry.prometheus-retention-time": 1000,
+        "oracle.enabled": true,
+        "oracle.oracle_address": "oracle:8080"
       }
     },
     "gaia": {
