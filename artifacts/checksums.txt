@@ -1,0 +1,2 @@
+69d9a78044b46fbcb6d9b093453762dd114e63f19b9735c2dee4cce380bc83be  calling_modules_and_contracts.wasm
+0ee26ab12f4e7dc6341dba20827ce675c7f32815e663f84435f0f04424cd572a  minimal_contract.wasm
