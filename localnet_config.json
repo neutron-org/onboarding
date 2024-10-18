@@ -16,7 +16,9 @@
         "./artifacts/contracts_thirdparty",
         "./artifacts/scripts/init-neutrond.sh"
       ],
-      "post_init": ["CHAINID=ntrntest CHAIN_DIR=/opt /opt/init-neutrond.sh"],
+      "post_init": [
+        "CHAINID=ntrntest CHAIN_DIR=/opt /opt/init-neutrond.sh"
+      ],
       "genesis_opts": {
         "app_state.crisis.constant_fee.denom": "untrn"
       },
@@ -45,7 +47,10 @@
       "prefix": "cosmos",
       "trace": true,
       "validators": 2,
-      "validators_balance": ["1900000000", "100000000"],
+      "validators_balance": [
+        "1900000000",
+        "100000000"
+      ],
       "genesis_opts": {
         "app_state.slashing.params.downtime_jail_duration": "10s",
         "app_state.slashing.params.signed_blocks_window": "10",
@@ -72,8 +77,17 @@
         "minimum-gas-prices": "0stake",
         "rosetta.enable": true
       },
-      "upload": ["./artifacts/scripts/init-gaia.sh"],
-      "post_start": ["/opt/init-gaia.sh > /opt/init-gaia.log 2>&1"]
+      "upload": [
+        "./artifacts/scripts/init-gaia.sh"
+      ],
+      "commands": {
+        "addGenesisAccount": "genesis add-genesis-account",
+        "gentx": "genesis gentx",
+        "collectGenTx": "genesis collect-gentxs"
+      },
+      "post_start": [
+        "/opt/init-gaia.sh > /opt/init-gaia.log 2>&1"
+      ]
     }
   },
   "custom_containers": [
@@ -81,8 +95,13 @@
       "name": "oracle",
       "image": "skip-mev/slinky-e2e-oracle",
       "entrypoint": "slinky --market-map-endpoint neutron_ics:9090",
-      "ports": ["8080:8080", "8002:8002"],
-      "depends_on": ["neutron_ics"]
+      "ports": [
+        "8080:8080",
+        "8002:8002"
+      ],
+      "depends_on": [
+        "neutron_ics"
+      ]
     }
   ],
   "master_mnemonic": "doctor output analyst penalty keep pear plastic divert obscure very census awake",
@@ -122,8 +141,16 @@
       "image": "hermes-test:1.0.0",
       "log_level": "trace",
       "type": "hermes",
-      "networks": ["neutron", "gaia"],
-      "connections": [["neutron", "gaia"]],
+      "networks": [
+        "neutron",
+        "gaia"
+      ],
+      "connections": [
+        [
+          "neutron",
+          "gaia"
+        ]
+      ],
       "mnemonic": "adapt pencil special actress cycle piece height planet swamp skill bullet scatter"
     },
     {
@@ -132,7 +159,10 @@
       "image": "neutron-query-relayer-test:1.0.0",
       "log_level": "debug",
       "type": "neutron",
-      "networks": ["neutron", "gaia"],
+      "networks": [
+        "neutron",
+        "gaia"
+      ],
       "mnemonic": "shell win pony health consider family trial office smoke curve action retreat"
     }
   ]
