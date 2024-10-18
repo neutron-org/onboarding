@@ -1,9 +1,14 @@
 #!/bin/bash
 DIR="$(dirname $0)"
-COMMIT_HASH_OR_BRANCH="v3.0.6"
+COMMIT_HASH_OR_BRANCH="v5.0.0-rc0"
 cd $DIR
 VERSION=$(cat ../../package.json | jq -r '.version')
-VERSION=":$VERSION"
+if [[ "$CI" == "true" ]]; then
+    VERSION="_$VERSION"
+    ORG=neutronorg/lionco-contracts:
+else
+    VERSION=":$VERSION"
+fi
 git clone https://github.com/neutron-org/neutron
 cd neutron
 git checkout $COMMIT_HASH_OR_BRANCH

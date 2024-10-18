@@ -1,0 +1,1 @@
+d09e3adf65b2e60fffe94bce9b550bf5922ecb0dff1b813bd94ee3d22f5ba51f  calling_modules_and_contracts.wasm
