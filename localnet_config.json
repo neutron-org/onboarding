@@ -90,7 +90,7 @@
   "wallets": {
     "demowallet1": {
       "mnemonic": "kiwi valid tiger wish shop time exile client metal view spatial ahead",
-      "balance": "1000000000"
+      "balance": "1000000000uibcatom,1000000000uibcusdc,1000000000"
     },
     "demo1": {
       "mnemonic": "leader valley slot danger safe size letter domain pole item uncle primary",
