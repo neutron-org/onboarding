@@ -1,6 +1,6 @@
 #!/bin/bash
 DIR="$(dirname $0)"
-COMMIT_HASH_OR_BRANCH="v5.0.0-rc0"
+COMMIT_HASH_OR_BRANCH="v6.0.0"
 cd $DIR
 VERSION=$(cat ../../package.json | jq -r '.version')
 if [[ "$CI" == "true" ]]; then

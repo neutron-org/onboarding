@@ -10,7 +10,11 @@
       "loglevel": "debug",
       "trace": true,
       "public": true,
-      "type": "ics",
+      "validators": 2,
+      "validators_balance": [
+        "1900000000",
+        "100000000"
+      ],
       "upload": [
         "./artifacts/contracts",
         "./artifacts/contracts_thirdparty",
@@ -20,7 +24,8 @@
         "CHAINID=ntrntest CHAIN_DIR=/opt /opt/init-neutrond.sh"
       ],
       "genesis_opts": {
-        "app_state.crisis.constant_fee.denom": "untrn"
+        "app_state.crisis.constant_fee.denom": "untrn",
+        "app_state.staking.params.bond_denom": "untrn"
       },
       "config_opts": {
         "consensus.timeout_commit": "500ms",
@@ -46,12 +51,15 @@
       "image": "gaia-test:1.0.0",
       "prefix": "cosmos",
       "trace": true,
-      "validators": 2,
+      "validators": 1,
       "validators_balance": [
-        "1900000000",
-        "100000000"
+        "1900000000"
       ],
       "genesis_opts": {
+        "app_state.feemarket.params.enabled": false,
+        "app_state.feemarket.params.fee_denom": "uatom",
+        "app_state.feemarket.params.min_base_gas_price": "0.0025",
+        "app_state.feemarket.state.base_gas_price": "0.0025",
         "app_state.slashing.params.downtime_jail_duration": "10s",
         "app_state.slashing.params.signed_blocks_window": "10",
         "app_state.slashing.params.min_signed_per_window": "0.9",
@@ -62,6 +70,9 @@
         "app_state.mint.params.inflation_max": "0.95",
         "app_state.mint.params.inflation_min": "0.5",
         "app_state.interchainaccounts.host_genesis_state.params.allow_messages": [
+          "*"
+        ],
+        "app_state.ibc.client_genesis.params.allowed_clients": [
           "*"
         ]
       },
@@ -92,15 +103,23 @@
   },
   "custom_containers": [
     {
-      "name": "oracle",
+      "name": "oracle-1",
       "image": "skip-mev/slinky-e2e-oracle",
-      "entrypoint": "slinky --market-map-endpoint neutron_ics:9090",
+      "entrypoint": "slinky --market-map-endpoint neutron_val1:9090",
       "ports": [
         "8080:8080",
         "8002:8002"
       ],
       "depends_on": [
-        "neutron_ics"
+        "neutron_val1"
+      ]
+    },
+    {
+      "name": "oracle-2",
+      "image": "skip-mev/slinky-e2e-oracle",
+      "entrypoint": "slinky --market-map-endpoint neutron_val2:9090",
+      "depends_on": [
+        "neutron_val2"
       ]
     }
   ],
@@ -110,6 +129,10 @@
     "demowallet1": {
       "mnemonic": "kiwi valid tiger wish shop time exile client metal view spatial ahead",
       "balance": "1000000000uibcatom,1000000000uibcusdc,1000000000"
+    },
+    "demowallet2": {
+      "mnemonic": "movie warfare trip creek math release indicate act margin poet answer powder",
+      "balance": "1000000000"
     },
     "demo1": {
       "mnemonic": "leader valley slot danger safe size letter domain pole item uncle primary",
@@ -121,10 +144,6 @@
     },
     "demo3": {
       "mnemonic": "hip decline human marriage spray base purse steel ginger amazing autumn mass",
-      "balance": "1000000000"
-    },
-    "demowallet2": {
-      "mnemonic": "movie warfare trip creek math release indicate act margin poet answer powder",
       "balance": "1000000000"
     }
   },
