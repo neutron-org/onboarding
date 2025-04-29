@@ -47,7 +47,7 @@
     "gaia": {
       "binary": "gaiad",
       "chain_id": "testgaia",
-      "denom": "stake",
+      "denom": "uatom",
       "image": "gaia-test:1.0.0",
       "prefix": "cosmos",
       "trace": true,
@@ -66,6 +66,7 @@
         "app_state.slashing.params.slash_fraction_downtime": "0.1",
         "app_state.staking.params.validator_bond_factor": "10",
         "app_state.staking.params.unbonding_time": "1814400s",
+        "app_state.staking.params.bond_denom": "uatom",
         "app_state.mint.minter.inflation": "0.9",
         "app_state.mint.params.inflation_max": "0.95",
         "app_state.mint.params.inflation_min": "0.5",
@@ -85,7 +86,7 @@
         "api.swagger": true,
         "grpc.enable": true,
         "grpc.address": "0.0.0.0:9090",
-        "minimum-gas-prices": "0stake",
+        "minimum-gas-prices": "0uatom",
         "rosetta.enable": true
       },
       "upload": [
@@ -155,7 +156,8 @@
         "chains.0.gas_multiplier": 1.2,
         "chains.0.trusting_period": "112h0m0s",
         "chains.1.gas_multiplier": 1.2,
-        "chains.1.trusting_period": "168h0m0s"
+        "chains.1.trusting_period": "168h0m0s",
+        "chains.1.gas_price.denom": "uatom"
       },
       "image": "hermes-test:1.0.0",
       "log_level": "trace",
