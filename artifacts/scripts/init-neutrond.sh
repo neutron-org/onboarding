@@ -10,24 +10,10 @@ IBCATOMDENOM=${IBCATOMDENOM:-uibcatom}
 IBCUSDCDENOM=${IBCUSDCDENOM:-uibcusdc}
 CONTRACTS_BINARIES_DIR=${CONTRACTS_BINARIES_DIR:-/opt/contracts}
 THIRD_PARTY_CONTRACTS_DIR=${THIRD_PARTY_CONTRACTS_DIR:-/opt/contracts_thirdparty}
-FEEMARKET_ENABLED=false
-ADMIN_MODULE_ADDRESS="neutron1hxskfdxpp5hqgtjj6am6nkjefhfzj359x0ar3z"
-
 
 # DEMO_MNEMONIC_2="veteran try aware erosion drink dance decade comic dawn museum release episode original list ability owner size tuition surface ceiling depth seminar capable only"
 # echo "$DEMO_MNEMONIC_2" | $BINARY keys add demowallet2 --home "$CHAIN_DIR" --recover --keyring-backend=test
 # $BINARY add-genesis-account "$($BINARY --home "$CHAIN_DIR" keys show demowallet2 --keyring-backend test -a --home "$CHAIN_DIR")" "100000000000000$STAKEDENOM,100000000000000$IBCATOMDENOM,100000000000000$IBCUSDCDENOM"  --home "$CHAIN_DIR"
-
-# IMPORTANT! minimum_gas_prices should always contain at least one record, otherwise the chain will not start or halt
-# ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2 denom is required by intgration tests (test:tokenomics)
-MIN_GAS_PRICES_DEFAULT='[{"denom":"ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2","amount":"0"},{"denom":"untrn","amount":"0"}]'
-MIN_GAS_PRICES=${MIN_GAS_PRICES:-"$MIN_GAS_PRICES_DEFAULT"}
-
-BYPASS_MIN_FEE_MSG_TYPES_DEFAULT='["/ibc.core.channel.v1.Msg/RecvPacket", "/ibc.core.channel.v1.Msg/Acknowledgement", "/ibc.core.client.v1.Msg/UpdateClient"]'
-BYPASS_MIN_FEE_MSG_TYPES=${BYPASS_MIN_FEE_MSG_TYPES:-"$BYPASS_MIN_FEE_MSG_TYPES_DEFAULT"}
-
-MAX_TOTAL_BYPASS_MIN_FEE_MSG_GAS_USAGE_DEFAULT=1000000
-MAX_TOTAL_BYPASS_MIN_FEE_MSG_GAS_USAGE=${MAX_TOTAL_BYPASS_MIN_FEE_MSG_GAS_USAGE:-"$MAX_TOTAL_BYPASS_MIN_FEE_MSG_GAS_USAGE_DEFAULT"}
 
 GENESIS_PATH="$CHAIN_DIR/config/genesis.json"
 
@@ -75,17 +61,8 @@ USE_COINGECKO_MARKETS=${USE_COINGECKO_MARKETS:-false}
 # echo "Creating and collecting gentx..."
 # $BINARY  gentx val1 "1000000$STAKEDENOM" --home "$CHAIN_DIR" --chain-id "$CHAINID" --keyring-backend test
 # $BINARY  collect-gentxs --home "$CHAIN_DIR"
+
 ### PARAMETERS SECTION
-
-## consensus params
-CONSENSUS_BLOCK_MAX_GAS=1000000000
-CONSENSUS_VOTE_EXTENSIONS_ENABLE_HEIGHT=1
-
-## slashing params
-SLASHING_SIGNED_BLOCKS_WINDOW=140000
-SLASHING_MIN_SIGNED=0.050000000000000000
-SLASHING_FRACTION_DOUBLE_SIGN=0.010000000000000000
-SLASHING_FRACTION_DOWNTIME=0.000100000000000000
 
 ##pre propose single parameters
 PRE_PROPOSAL_SINGLE_AMOUNT=1000
@@ -818,31 +795,9 @@ rm markets.json
 echo "Setting the rest of Neutron genesis params..."
 set_genesis_param admins                                 "[\"$NEUTRON_CHAIN_MANAGER_CONTRACT_ADDRESS\"]"  # admin module
 set_genesis_param treasury_address                       "\"$DAO_CONTRACT_ADDRESS\""                      # feeburner
-set_genesis_param fee_collector_address                  "\"$DAO_CONTRACT_ADDRESS\","                      # tokenfactory
+set_genesis_param fee_collector_address                  "\"$DAO_CONTRACT_ADDRESS\","                     # tokenfactory
+set_genesis_param escrow_account_address                 "\"$DAO_CONTRACT_ADDRESS_B64\","                 # builder(POB)
 set_genesis_param_jq ".app_state.cron.params.security_address" "\"$SECURITY_SUBDAO_CORE_CONTRACT_ADDRESS\"" # cron
-set_genesis_param limit                                  5                                                # cron
-set_genesis_param signed_blocks_window                   "\"$SLASHING_SIGNED_BLOCKS_WINDOW\","            # slashing
-set_genesis_param min_signed_per_window                  "\"$SLASHING_MIN_SIGNED\","                      # slashing
-set_genesis_param slash_fraction_double_sign             "\"$SLASHING_FRACTION_DOUBLE_SIGN\","            # slashing
-set_genesis_param slash_fraction_downtime                "\"$SLASHING_FRACTION_DOWNTIME\""                # slashing
-set_genesis_param minimum_gas_prices                     "$MIN_GAS_PRICES,"                               # globalfee
-set_genesis_param max_total_bypass_min_fee_msg_gas_usage "\"$MAX_TOTAL_BYPASS_MIN_FEE_MSG_GAS_USAGE\""    # globalfee
-set_genesis_param_jq ".app_state.globalfee.params.bypass_min_fee_msg_types" "$BYPASS_MIN_FEE_MSG_TYPES"   # globalfee
-set_genesis_param proposer_fee                          "\"0.25\""                                        # builder(POB)
-set_genesis_param escrow_account_address                "\"$DAO_CONTRACT_ADDRESS_B64\","                  # builder(POB)
-set_genesis_param sudo_call_gas_limit                   "\"1000000\""                                     # contractmanager
-set_genesis_param max_gas                               "\"$CONSENSUS_BLOCK_MAX_GAS\""                    # consensus_params
-set_genesis_param vote_extensions_enable_height         "\"$CONSENSUS_VOTE_EXTENSIONS_ENABLE_HEIGHT\""    # consensus_params
-set_genesis_param_jq ".app_state.bank.denom_metadata" "[$NTRN_DENOM_METADATA]"                            # bank
-set_genesis_param_jq ".app_state.marketmap.params.admin" "\"$ADMIN_MODULE_ADDRESS\""                      # marketmap
-set_genesis_param_jq ".app_state.marketmap.params.market_authorities" "[\"$ADMIN_MODULE_ADDRESS\"]"       # marketmap
-set_genesis_param_jq ".app_state.feemarket.params.max_block_utilization" "\"$CONSENSUS_BLOCK_MAX_GAS\""   # feemarket
-set_genesis_param_jq ".app_state.feemarket.params.min_base_gas_price"    "\"0.0025\""                     # feemarket
-set_genesis_param_jq ".app_state.feemarket.params.fee_denom"       "\"untrn\""                            # feemarket
-set_genesis_param_jq ".app_state.feemarket.params.max_learning_rate" "\"0.5\""                            # feemarket
-set_genesis_param_jq ".app_state.feemarket.params.enabled" "$FEEMARKET_ENABLED"                           # feemarket
-set_genesis_param_jq ".app_state.feemarket.params.distribute_fees" "true"                                 # feemarket
-set_genesis_param_jq ".app_state.feemarket.state.base_gas_price" "\"0.0025\""                             # feemarket
 set_genesis_param_jq ".app_state.harpoon.hook_subscriptions" "[
                                                                {\"contract_addresses\": ["\"$NEUTRON_STAKING_TRACKER_CONTRACT_ADDRESS\""], \"hook_type\": 1},
                                                                {\"contract_addresses\": ["\"$NEUTRON_STAKING_TRACKER_CONTRACT_ADDRESS\""], \"hook_type\": 3},
