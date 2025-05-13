@@ -1,9 +1,10 @@
 #!/bin/bash
 DIR="$(dirname $0)"
+COMMIT_HASH_OR_BRANCH="main"
 cd $DIR
-git clone -b foxpy/low-submission-margin-period https://github.com/neutron-org/neutron-query-relayer
 VERSION=$(cat ../../package.json | jq -r '.version')
 VERSION=":$VERSION"
+git clone https://github.com/neutron-org/neutron-query-relayer -b ${COMMIT_HASH_OR_BRANCH}
 cd neutron-query-relayer
 GVERSION=$(echo $(git describe --tags) | sed 's/^v//')
 COMMIT=$(git log -1 --format='%H')
