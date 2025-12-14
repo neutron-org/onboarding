@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@chain-registry/types": "^0.50.1",
+    "@chain-registry/types": "^0.50.260",
     "@cosmjs/amino": "^0.32.4",
     "@cosmjs/proto-signing": "^0.32.4",
     "@cosmos-kit/core": "^2.15.0",
